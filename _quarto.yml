@@ -14,7 +14,7 @@ format:
     toc: true
 
 website:
-  title: "xstofai"
+  title: "Christof's AI-related notes"
   description: "Repository for AI-related learning and experiments"
   execute: 
     enabled: false
