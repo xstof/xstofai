@@ -3,5 +3,9 @@ website:
     contents:
       - index.ipynb
       - 00_core.ipynb
+      - section: Environment
+        contents:
+        - ./nbs/install-env.md
+        - ./nbs/jupyter.md
+        - ./nbs/tmux.md
       - README.md
-      - ./nbs/install-env.md
