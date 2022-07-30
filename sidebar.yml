@@ -8,4 +8,7 @@ website:
         - ./nbs/install-env.md
         - ./nbs/jupyter.md
         - ./nbs/tmux.md
+      - section: Loss Functions
+        contents:
+        - ./nbs/cross-entropy-loss.ipynb
       - README.md
