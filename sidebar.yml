@@ -11,4 +11,7 @@ website:
       - section: Loss Functions
         contents:
         - ./nbs/cross-entropy-loss.ipynb
+      - section: Optimization
+        contents:
+        - ./nbs/optimization.ipynb
       - README.md
