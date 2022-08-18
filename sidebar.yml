@@ -15,5 +15,5 @@ website:
         contents:
         - ./nbs/optimization.ipynb
       - section: Samples
-        - ./nbs/titanic - linear and nn from scratch.ipynb
+        - './nbs/titanic - linear and nn from scratch.ipynb'
       - README.md
