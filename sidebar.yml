@@ -17,4 +17,5 @@ website:
       - section: Samples
         contents:
         - ./nbs/titanic - linear and nn from scratch.ipynb
+        - ./nbs/traffic-sign-recognition.ipynb
       - README.md
