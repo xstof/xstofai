@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://xstof.github.io/xstofai/index.html</loc>
+    <lastmod>2022-08-29T06:43:54.498Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/core.html</loc>
+    <lastmod>2022-08-29T06:43:55.983Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/jupyter.html</loc>
+    <lastmod>2022-08-29T06:43:56.323Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/tmux.html</loc>
+    <lastmod>2022-08-29T06:43:56.651Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/optimization.html</loc>
+    <lastmod>2022-08-29T06:43:56.983Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/install-env.html</loc>
+    <lastmod>2022-08-29T06:43:57.287Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/titanic - linear and nn from scratch.html</loc>
+    <lastmod>2022-08-29T06:43:57.986Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/cross-entropy-loss.html</loc>
+    <lastmod>2022-08-29T06:43:58.462Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/traffic-sign-recognition.html</loc>
+    <lastmod>2022-08-29T06:43:59.254Z</lastmod>
+  </url>
+  <url>
+    <loc>https://xstof.github.io/xstofai/nbs/architectures.html</loc>
+    <lastmod>2022-08-29T06:43:59.566Z</lastmod>
+  </url>
+</urlset>
