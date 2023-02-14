@@ -16,8 +16,6 @@ format:
 website:
   title: "Christof's AI-related notes"
   description: "Repository for AI-related learning and experiments"
-  execute: 
-    enabled: false
   twitter-card: true
   open-graph: true
   reader-mode: true
