@@ -1,0 +1,25 @@
+website:
+  sidebar:
+    contents:
+      - ./index.ipynb
+      - section: Environment
+        contents:
+        - ./install-env.md
+        - ./jupyter.md
+        - ./tmux.md
+      - section: Foundations
+        contents:
+        - section: Loss Functions
+          contents:
+          - ./cross-entropy-loss.ipynb
+        - section: Optimization
+          contents:
+          - ./optimization.ipynb
+        - section: Practical
+          contents:
+          - ./architectures.ipynb
+        - section: Samples
+          contents:
+          - ./titanic - linear and nn from scratch.ipynb
+          - ./traffic-sign-recognition.ipynb
+      - section: Large Language Models
