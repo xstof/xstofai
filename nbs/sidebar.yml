@@ -23,3 +23,5 @@ website:
           - ./titanic - linear and nn from scratch.ipynb
           - ./traffic-sign-recognition.ipynb
       - section: Large Language Models
+        contents:
+        - ./llm.md
