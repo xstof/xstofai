@@ -7,17 +7,19 @@ website:
         - ./nbs/install-env.md
         - ./nbs/jupyter.md
         - ./nbs/tmux.md
-      - section: Loss Functions
+      - section: Foundations
         contents:
-        - ./nbs/cross-entropy-loss.ipynb
-      - section: Optimization
-        contents:
-        - ./nbs/optimization.ipynb
-      - section: Practical
-        contents:
-        - ./nbs/architectures.ipynb
-      - section: Samples
-        contents:
-        - ./nbs/titanic - linear and nn from scratch.ipynb
-        - ./nbs/traffic-sign-recognition.ipynb
+        - section: Loss Functions
+          contents:
+          - ./nbs/cross-entropy-loss.ipynb
+        - section: Optimization
+          contents:
+          - ./nbs/optimization.ipynb
+        - section: Practical
+          contents:
+          - ./nbs/architectures.ipynb
+        - section: Samples
+          contents:
+          - ./nbs/titanic - linear and nn from scratch.ipynb
+          - ./nbs/traffic-sign-recognition.ipynb
       - README.md
