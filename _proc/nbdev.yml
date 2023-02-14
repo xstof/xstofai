@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "Christof's AI-related notes"
+  site-url: "https://xstof.github.io/xstofai/"
+  description: "Repository for AI-related learning and experiments"
+  repo-branch: main
+  repo-url: "https://github.com/xstof/xstofai/"
