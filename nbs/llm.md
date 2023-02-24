@@ -4,13 +4,14 @@
 
 ### Resources
 
+- [Andrej Karpathy's YouTube channel on the making of MakeMore and GPT](https://www.youtube.com/@AndrejKarpathy)
 - [Primer on Transformers](https://aman.ai/primers/ai/transformers/)
 - [Study guide on Transformers](https://github.com/dair-ai/Transformers-Recipe)
 - [Stanford CS224N - NLP with Deep Learning](https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ)
 - [Stanford CS25 - Tranformers United](https://www.youtube.com/playlist?list=PLoROMvodv4rNiJRchCzutFw5ItR_Z27CM)
 - [Papers with Code - Language Models](https://paperswithcode.com/methods/category/language-models)
 
-## Techniques
+## Prompting Techniques
 
 ### Zero Shot Prompting
 
@@ -43,6 +44,7 @@ See [Paper - ReAct: Synergizing Reasoning and Acting in Language Models](https:/
 ### Resources
 
 [Prompt Engineering Guide](https://github.com/dair-ai/Prompt-Engineering-Guide)
+[Effectiveness of ChatGPT versus state-of-the-art: ChatGPT: Jack of all trades, master of none](https://arxiv.org/abs/2302.10724) - tested ChatGPT on 25 tasks and compared performance with the state-of-the-art.
 
 ## Optimizations
 
