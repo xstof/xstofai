@@ -24,4 +24,10 @@ website:
           - ./traffic-sign-recognition.ipynb
       - section: Large Language Models
         contents:
-        - ./llm.md
+        - section: General
+          contents:
+          - ./llm.md
+        - section: NanoGPT experiment
+          contents:
+          - nanogpt-pytorch-embeddings.ipynb
+          - nanogpt-math-trick.ipynb
