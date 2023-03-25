@@ -28,6 +28,7 @@ website:
           contents:
           - ./llm.md
         - section: Building Blocks
+          contents:
           - self-attention.ipynb
         - section: NanoGPT experiment
           contents:
