@@ -4,8 +4,9 @@
 
 ### Resources
 
-- [Andrej Karpathy's YouTube channel on the making of MakeMore and GPT](https://www.youtube.com/@AndrejKarpathy)
+- [Andrej Karpathy's YouTube channel on the making of MakeMore and GPT](https://www.youtube.com/@AndrejKarpathy) - see [notebooks here](./nanogpt-pytorch-embeddings.ipynb)
 - [Primer on Transformers](https://aman.ai/primers/ai/transformers/)
+- [Self Attention from Scratch](https://sebastianraschka.com/blog/2023/self-attention-from-scratch.html)
 - [Study guide on Transformers](https://github.com/dair-ai/Transformers-Recipe)
 - [Stanford CS224N - NLP with Deep Learning](https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ)
 - [Stanford CS25 - Tranformers United](https://www.youtube.com/playlist?list=PLoROMvodv4rNiJRchCzutFw5ItR_Z27CM)
@@ -52,3 +53,6 @@ See [Paper - ReAct: Synergizing Reasoning and Acting in Language Models](https:/
 
 - [Blog post by Alistair Pullen](https://www.buildt.ai/blog/incorrectusage) explains that latency significantly goes up as you use larger models like Da Vinci.  He explains an approacht to reduce price by a factor 40 while reducing latency 4 to 5 times at the trade-off of getting 90% similar results to Da Vinci.  The approach generates a corpus of completions using Da Vinci.  Then use that corpus to train Babbage.
 
+## GPT4
+
+- [Most comprehensive study of GPT4 abilities in March 2023](https://arxiv.org/abs/2303.12712)

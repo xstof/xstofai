@@ -27,6 +27,8 @@ website:
         - section: General
           contents:
           - ./llm.md
+        - section: Building Blocks
+          - self-attention.ipynb
         - section: NanoGPT experiment
           contents:
           - nanogpt-pytorch-embeddings.ipynb
