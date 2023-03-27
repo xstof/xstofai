@@ -35,3 +35,6 @@ website:
           - nanogpt-pytorch-embeddings.ipynb
           - nanogpt-math-trick.ipynb
           - nanogpt-bigram-model.ipynb
+      - section: Pytorch
+        contents:
+        - ./pytorch-broadcasting.ipynb
