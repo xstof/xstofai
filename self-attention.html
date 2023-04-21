@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Christof’s AI-related notes - Self Attention</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Christof’s AI-related notes - Self Attention">
+<meta property="og:description" content="The below personal learning notes made use of Understanding and Coding the Self-Attention Mechanism of Large Language Models From Scratch">
+<meta property="og:site-name" content="Christof's AI-related notes">
+<meta name="twitter:title" content="Christof’s AI-related notes - Self Attention">
+<meta name="twitter:description" content="The below personal learning notes made use of Understanding and Coding the Self-Attention Mechanism of Large Language Models From Scratch">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Christof’s AI-related notes</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Self Attention</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Introduction</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Environment</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./install-env.html" class="sidebar-item-text sidebar-link">Install Environment</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./jupyter.html" class="sidebar-item-text sidebar-link">Using Jupiter Notebooks</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tmux.html" class="sidebar-item-text sidebar-link">Using tmux</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Foundations</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false">Loss Functions</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cross-entropy-loss.html" class="sidebar-item-text sidebar-link">Cross-Entropy Loss</a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="false">Optimization</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./optimization.html" class="sidebar-item-text sidebar-link">Optimization</a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">Practical</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./architectures.html" class="sidebar-item-text sidebar-link">Architectures</a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">Samples</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./titanic - linear and nn from scratch.html" class="sidebar-item-text sidebar-link">Titanic</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./traffic-sign-recognition.html" class="sidebar-item-text sidebar-link">Traffic Sign Recognition</a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">Large Language Models</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false">General</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./llm.html" class="sidebar-item-text sidebar-link">Large Language Models</a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">Building Blocks</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./self-attention.html" class="sidebar-item-text sidebar-link active">Self Attention</a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="false">NanoGPT experiment</a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" aria-expanded="false">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nanogpt-pytorch-embeddings.html" class="sidebar-item-text sidebar-link">NanoGPT - Embeddings</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nanogpt-math-trick.html" class="sidebar-item-text sidebar-link">NanoGPT - Math Trick</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./nanogpt-bigram-model.html" class="sidebar-item-text sidebar-link">NanoGPT - Bigram Model</a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">Pytorch</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./pytorch-broadcasting.html" class="sidebar-item-text sidebar-link">Pytorch Broadcasting</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#what-is-self-attention" id="toc-what-is-self-attention" class="nav-link active" data-scroll-target="#what-is-self-attention">What is self-attention?</a></li>
+  <li><a href="#embedding-an-input-sentence" id="toc-embedding-an-input-sentence" class="nav-link" data-scroll-target="#embedding-an-input-sentence">Embedding an Input Sentence</a></li>
+  <li><a href="#defining-weight-matrices" id="toc-defining-weight-matrices" class="nav-link" data-scroll-target="#defining-weight-matrices">Defining weight matrices</a></li>
+  <li><a href="#calculate-the-query-key-and-value-for-one-word" id="toc-calculate-the-query-key-and-value-for-one-word" class="nav-link" data-scroll-target="#calculate-the-query-key-and-value-for-one-word">Calculate the query, key and value for one word</a></li>
+  <li><a href="#generalizing-the-calculation-to-all-inputs-in-the-sequence" id="toc-generalizing-the-calculation-to-all-inputs-in-the-sequence" class="nav-link" data-scroll-target="#generalizing-the-calculation-to-all-inputs-in-the-sequence">Generalizing the calculation to all inputs in the sequence</a></li>
+  <li><a href="#computing-attention-scores" id="toc-computing-attention-scores" class="nav-link" data-scroll-target="#computing-attention-scores">Computing Attention Scores</a></li>
+  <li><a href="#multi-head-attention" id="toc-multi-head-attention" class="nav-link" data-scroll-target="#multi-head-attention">Multi-Head Attention</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#resources" id="toc-resources" class="nav-link" data-scroll-target="#resources">Resources</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/xstof/xstofai/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Self Attention</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>The below personal learning notes made use of <a href="https://sebastianraschka.com/blog/2023/self-attention-from-scratch.html">Understanding and Coding the Self-Attention Mechanism of Large Language Models From Scratch</a></p>
+<section id="what-is-self-attention" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-self-attention">What is self-attention?</h2>
+<p>Self-Attention started out from research work in translation and was introduced to give access to all elements in a sequence at each time step. In language tasks, the meaning of a word can depend on the context within a larger text document. Attention enables the model to weigh the importance of different elements in the input sequence and adjust their influence on the output.</p>
+</section>
+<section id="embedding-an-input-sentence" class="level2">
+<h2 class="anchored" data-anchor-id="embedding-an-input-sentence">Embedding an Input Sentence</h2>
+<p>Our input is: “Playing music makes me very happy”. We’ll create an embeding for this entire sentence first.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sentence <span class="op">=</span> <span class="st">"Playing music makes me very happy"</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sentence_words <span class="op">=</span> sentence.split()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sentence_words</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['Playing', 'music', 'makes', 'me', 'very', 'happy']</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sentence_words_sorted <span class="op">=</span> <span class="bu">sorted</span>(sentence_words)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sentence_words_sorted</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['Playing', 'happy', 'makes', 'me', 'music', 'very']</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">dict</span> <span class="op">=</span> {word_str:word_idx <span class="cf">for</span> word_idx, word_str <span class="kw">in</span> <span class="bu">enumerate</span>(sentence_words_sorted)}</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">dict</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>{'Playing': 0, 'happy': 1, 'makes': 2, 'me': 3, 'music': 4, 'very': 5}</code></pre>
+</div>
+</div>
+<p><code>dict</code> is our dictionary, conveniently restricted to just the words we’re using here. Every word we’re using has a number associated (the index in our dictionary.</p>
+<p>We can now translate our sentence in an array of integers:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sentence_int <span class="op">=</span> torch.tensor([<span class="bu">dict</span>[word] <span class="cf">for</span> word <span class="kw">in</span> sentence_words])</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sentence_int</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([0, 4, 2, 3, 5, 1])</code></pre>
+</div>
+</div>
+<p>Now that our sentence is translated into a list of integers, we can use those with an embedding layer to encode the inputs into a real vector embedding. Let’s use 16 dimensions, so that each word is translated/mapped onto an embedding of 16 floats.</p>
+<p>If our sentence is 6 words (or whatever is the context length we end up choosing), the resulting vector after our embedding layer will be: <span class="math inline">\(6 \times 16\)</span>. We’ll create a pytorch embedding layer with 6 possible indices and a 16-dimensional embedding vector for each index.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>embed <span class="op">=</span> torch.nn.Embedding(<span class="dv">6</span>,<span class="dv">16</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sentence_embedded <span class="op">=</span> embed(sentence_int).detach()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentence_embedded)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentence_embedded.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tensor([[ 0.3, -0.2, -0.3, -0.6,  0.3,  0.7, -0.2, -0.4,  0.8, -1.2,  0.7, -1.4,
+          0.2,  1.9,  0.5,  0.3],
+        [ 0.5,  1.0, -0.3, -1.1, -0.0,  1.6, -2.3,  1.1,  0.7,  0.7, -0.9, -0.1,
+         -0.2,  0.1,  0.4, -1.4],
+        [-1.3,  0.2, -2.1,  1.1, -0.4, -0.9, -0.5, -1.1,  0.9,  1.6,  0.6, -0.2,
+          0.1, -0.1,  0.3, -0.6],
+        [ 0.9,  1.6, -1.5,  1.1, -1.2,  1.3,  1.1,  0.1,  2.2, -0.8, -0.3,  0.8,
+         -0.7, -0.8,  0.2,  0.2],
+        [ 0.3, -0.5,  1.0,  0.8, -0.4,  0.5, -0.2, -1.7, -1.6, -1.1,  0.9, -0.7,
+         -0.6, -0.7,  0.6, -1.4],
+        [-0.1, -1.0, -0.2,  0.9,  1.6,  1.3,  1.3, -0.2,  0.5, -1.6,  1.0, -1.1,
+         -1.2,  0.3, -0.6, -2.8]])
+torch.Size([6, 16])</code></pre>
+</div>
+</div>
+<p>So, we gave the embedding a tensor of 6 integers, which got translated in <span class="math inline">\(6 \times 16\)</span> tensors, meaning: each index, representing a word, it translated into an array of 16 floats. We can look into the weights of our embedding layer here as well:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>embed.weight</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Parameter containing:
+tensor([[ 0.3, -0.2, -0.3, -0.6,  0.3,  0.7, -0.2, -0.4,  0.8, -1.2,  0.7, -1.4,
+          0.2,  1.9,  0.5,  0.3],
+        [-0.1, -1.0, -0.2,  0.9,  1.6,  1.3,  1.3, -0.2,  0.5, -1.6,  1.0, -1.1,
+         -1.2,  0.3, -0.6, -2.8],
+        [-1.3,  0.2, -2.1,  1.1, -0.4, -0.9, -0.5, -1.1,  0.9,  1.6,  0.6, -0.2,
+          0.1, -0.1,  0.3, -0.6],
+        [ 0.9,  1.6, -1.5,  1.1, -1.2,  1.3,  1.1,  0.1,  2.2, -0.8, -0.3,  0.8,
+         -0.7, -0.8,  0.2,  0.2],
+        [ 0.5,  1.0, -0.3, -1.1, -0.0,  1.6, -2.3,  1.1,  0.7,  0.7, -0.9, -0.1,
+         -0.2,  0.1,  0.4, -1.4],
+        [ 0.3, -0.5,  1.0,  0.8, -0.4,  0.5, -0.2, -1.7, -1.6, -1.1,  0.9, -0.7,
+         -0.6, -0.7,  0.6, -1.4]], requires_grad=True)</code></pre>
+</div>
+</div>
+<p>This is basically a kind of “lookup” matrix, where we can lookup the embedding vector corresponding to every token in our dictionary. As such: dictionary token with index:</p>
+<ul>
+<li><code>0</code> will return: <code>[0.3, -0.2, -0.3, -0.6,  0.3,  0.7, -0.2, -0.4,  0.8, -1.2,  0.7, -1.4, 0.2,  1.9,  0.5,  0.3]</code></li>
+<li><code>1</code> will return: <code>[-0.1, -1.0, -0.2,  0.9,  1.6,  1.3,  1.3, -0.2,  0.5, -1.6,  1.0, -1.1, -1.2,  0.3, -0.6, -2.8]</code></li>
+<li><code>2</code> will return: <code>[-1.3,  0.2, -2.1,  1.1, -0.4, -0.9, -0.5, -1.1,  0.9,  1.6,  0.6, -0.2, 0.1, -0.1,  0.3, -0.6]</code></li>
+</ul>
+<p>and so on. Given our sentence had tokens with indexes: <span class="math inline">\(\begin{bmatrix} 0 &amp; 4 &amp; 2 &amp; 3 &amp; 5 &amp; 1 \end{bmatrix}\)</span> we expect first the first row, then the 5th, then 3rd, … and so on, which gives the same end result:</p>
+<span class="math display">\[\begin{bmatrix}
+0.3 &amp; -0.2 &amp; -0.3 &amp; -0.6 &amp; 0.3 &amp; 0.7 &amp; -0.2 &amp; -0.4 &amp; 0.8 &amp; -1.2 &amp; 0.7 &amp; -1.4 &amp; 0.2 &amp; 1.9 &amp; 0.5 &amp; 0.3 \\
+0.5 &amp; 1.0 &amp; -0.3 &amp; -1.1 &amp; -0.0 &amp; 1.6 &amp; -2.3 &amp; 1.1 &amp; 0.7 &amp; 0.7 &amp; -0.9 &amp; -0.1 &amp; -0.2 &amp; 0.1 &amp; 0.4 &amp; -1.4 \\
+-1.3 &amp; 0.2 &amp; -2.1 &amp; 1.1 &amp; -0.4 &amp; -0.9 &amp; -0.5 &amp; -1.1 &amp; 0.9 &amp; 1.6 &amp; 0.6 &amp; -0.2 &amp; 0.1 &amp; -0.1 &amp; 0.3 &amp; -0.6 \\
+0.9 &amp; 1.6 &amp; -1.5 &amp; 1.1 &amp; -1.2 &amp; 1.3 &amp; 1.1 &amp; 0.1 &amp; 2.2 &amp; -0.8 &amp; -0.3 &amp; 0.8 &amp; -0.7 &amp; -0.8 &amp; 0.2 &amp; 0.2 \\
+0.3 &amp; -0.5 &amp; 1.0 &amp; 0.8 &amp; -0.4 &amp; 0.5 &amp; -0.2 &amp; -1.7 &amp; -1.6 &amp; -1.1 &amp; 0.9 &amp; -0.7 &amp; -0.6 &amp; -0.7 &amp; 0.6 &amp; -1.4 \\
+-0.1 &amp; -1.0 &amp; -0.2 &amp; 0.9 &amp; 1.6 &amp; 1.3 &amp; 1.3 &amp; -0.2 &amp; 0.5 &amp; -1.6 &amp; 1.0 &amp; -1.1 &amp; -1.2 &amp; 0.3 &amp; -0.6 &amp; -2.8
+\end{bmatrix}\]</span>
+</section>
+<section id="defining-weight-matrices" class="level2">
+<h2 class="anchored" data-anchor-id="defining-weight-matrices">Defining weight matrices</h2>
+<p>Self-attention has 3 weight matrices which are each adjusted, like other model parameters, during training.</p>
+<ul>
+<li><span class="math inline">\(W_{q}\)</span>: projects our input to the <em>query</em></li>
+<li><span class="math inline">\(W_{k}\)</span>: projects our input to the <em>key</em></li>
+<li><span class="math inline">\(W_{v}\)</span>: projects our input to the <em>value</em></li>
+</ul>
+<p>each of <em>query</em> <span class="math inline">\(q\)</span>, <em>key</em> <span class="math inline">\(k\)</span> and <em>value</em> <span class="math inline">\(v\)</span> are vectors of an input element. We can calculate those through matrix multiplication between those <span class="math inline">\(W\)</span> matrices and the embedded inputs <span class="math inline">\(x\)</span>. Our sequence has length <span class="math inline">\(T\)</span>.</p>
+<ul>
+<li><span class="math inline">\(q^{i} = W_{q} x^{(i)}\)</span> for the element on index i, i between <span class="math inline">\(0\)</span> and <span class="math inline">\(T-1\)</span></li>
+<li><span class="math inline">\(k^{i} = W_{k} x^{(i)}\)</span> for the element on index i, i between <span class="math inline">\(0\)</span> and <span class="math inline">\(T-1\)</span></li>
+<li><span class="math inline">\(v^{i} = W_{v} x^{(i)}\)</span> for the element on index i, i between <span class="math inline">\(0\)</span> and <span class="math inline">\(T-1\)</span></li>
+</ul>
+<p>This will give us three vectors for each input element (token) in our sequence.</p>
+<p>Let’s assume that <span class="math inline">\(d\)</span> is the size (number of dimensions) of each (embedded) word vector x (here 16). Our vector <span class="math inline">\(q^{i}\)</span> is the query vector for word at index <span class="math inline">\(i\)</span> and has a dimension we can choose. We’ll call this <span class="math inline">\(d_q\)</span>. In the same way we’ll call <span class="math inline">\(d_k\)</span> as the dimension for <span class="math inline">\(k^{i}\)</span>.</p>
+<p>We’ll calculate the dot product between the query and key vectors, this means that each of them needs to have the same dimensions: <span class="math inline">\(d_q = d_k\)</span>. Let’s choose <span class="math inline">\(d_q = d_k = 24\)</span> in this case.<br> If <span class="math display">\[q^{i} = W_{q} x^{(i)}\]</span> then:</p>
+<ul>
+<li>the dimension for <span class="math inline">\(q^{i}\)</span> is <span class="math inline">\(d_q\)</span> which is the same as <span class="math inline">\(d_k\)</span>, here 24, something we chose</li>
+<li>the dimension for <span class="math inline">\(W_{q}\)</span> is <span class="math inline">\(d_q \times d\)</span>, here 24 by 16, because every word is represented by 16 floats</li>
+<li>the dimension for <span class="math inline">\(x^{(i)}\)</span> is <span class="math inline">\(d\)</span>, here 16 (16 floats for every word)</li>
+</ul>
+<p>Our dimension for the value vector can be chosen arbitrarily, let’s say: 28 in our example. That’s the size of the resulting context vector.</p>
+<p>Let’s set up some arbitrary weight matrices:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="dv">16</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>d_q, d_k, d_v <span class="op">=</span> <span class="dv">24</span>, <span class="dv">24</span>, <span class="dv">28</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>W_query <span class="op">=</span> torch.rand(d_q,d)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>W_key <span class="op">=</span> torch.rand(d_k,d)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>W_value <span class="op">=</span> torch.rand(d_v,d)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>W_query.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>torch.Size([24, 16])</code></pre>
+</div>
+</div>
+</section>
+<section id="calculate-the-query-key-and-value-for-one-word" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-the-query-key-and-value-for-one-word">Calculate the query, key and value for one word</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x_2 <span class="op">=</span> sentence_embedded[<span class="dv">2</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>query_2 <span class="op">=</span> W_query.matmul(x_2)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'W_query has shape </span><span class="sc">{</span>W_query<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, x_2 has shape </span><span class="sc">{</span>x_2<span class="sc">.</span>shape<span class="sc">}</span><span class="ss"> and resulting query_2 has shape: </span><span class="sc">{</span>query_2<span class="sc">.</span>shape<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'the resulting tensor is our query tensor for word at index 2:'</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(query_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>W_query has shape torch.Size([24, 16]), x_2 has shape torch.Size([16]) and resulting query_2 has shape: torch.Size([24])
+
+the resulting tensor is our query tensor for word at index 2:
+tensor([-2.4, -1.3,  0.0,  0.4, -0.2, -1.8, -1.0, -0.7, -1.9, -0.0, -1.6, -0.7,
+        -2.0, -1.3, -1.6, -1.5, -1.1, -2.8, -0.4,  0.7, -1.7,  1.0, -1.1, -3.2])</code></pre>
+</div>
+</div>
+<p>we can do the same to get the key and value vector for the word at index 2:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>query_2 <span class="op">=</span> W_query <span class="op">@</span> x_2 <span class="co"># same as matmul</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>key_2 <span class="op">=</span> W_key <span class="op">@</span> x_2</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>value_2 <span class="op">=</span> W_value <span class="op">@</span> x_2</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(query_2)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(key_2)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(value_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tensor([-2.4, -1.3,  0.0,  0.4, -0.2, -1.8, -1.0, -0.7, -1.9, -0.0, -1.6, -0.7,
+        -2.0, -1.3, -1.6, -1.5, -1.1, -2.8, -0.4,  0.7, -1.7,  1.0, -1.1, -3.2])
+tensor([ 0.6, -2.3, -1.8, -1.3, -1.9, -0.6, -1.5, -3.0,  0.4, -1.9, -0.7, -2.1,
+        -2.0, -0.9, -1.6, -2.1, -0.4, -0.2,  0.5, -1.1, -2.5, -0.4,  0.4, -3.0])
+tensor([-1.1, -0.9, -3.0, -0.7, -2.2,  0.1,  0.0, -2.8, -2.1,  0.7, -0.7, -1.6,
+        -2.6, -1.3, -0.9, -0.5, -1.8, -3.0, -0.7, -1.3,  0.5, -1.1, -1.8, -2.2,
+         0.6, -0.0, -1.8, -1.3])</code></pre>
+</div>
+</div>
+</section>
+<section id="generalizing-the-calculation-to-all-inputs-in-the-sequence" class="level2">
+<h2 class="anchored" data-anchor-id="generalizing-the-calculation-to-all-inputs-in-the-sequence">Generalizing the calculation to all inputs in the sequence</h2>
+<p>We can generalize what we did for a single token or word to all of our inputs in our sequence now.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>keys <span class="op">=</span> (W_key <span class="op">@</span> sentence_embedded.T).T</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> (W_value <span class="op">@</span> sentence_embedded.T).T</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'all keys (shape </span><span class="sc">{</span>keys<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">): </span><span class="ch">\n</span><span class="sc">{</span>keys<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'all values (shape </span><span class="sc">{</span>values<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">): </span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>values<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>all keys (shape torch.Size([6, 24])): 
+tensor([[ 0.9,  1.2,  2.2,  1.3,  0.8, -1.6, -0.2,  2.0, -0.4,  1.7,  0.1,  2.2,
+         -0.2, -0.7, -0.2, -0.2,  0.8,  1.0,  0.7,  1.7,  2.8,  1.5, -0.9,  1.1],
+        [ 0.9,  0.1,  0.7, -1.1,  1.3, -0.2,  1.0, -0.7,  1.5,  0.3, -0.3,  0.3,
+          1.5, -1.1,  1.4,  0.4, -2.5,  0.4,  0.0, -0.1,  1.2,  1.3,  1.7,  0.5],
+        [ 0.6, -2.3, -1.8, -1.3, -1.9, -0.6, -1.5, -3.0,  0.4, -1.9, -0.7, -2.1,
+         -2.0, -0.9, -1.6, -2.1, -0.4, -0.2,  0.5, -1.1, -2.5, -0.4,  0.4, -3.0],
+        [ 2.5,  2.0,  1.3,  2.5,  2.3,  3.6,  2.9,  1.0,  3.3,  2.8,  3.6,  1.1,
+          3.1,  2.8,  1.8,  1.9,  0.4,  1.4,  2.4,  1.3,  2.2,  2.2,  2.4,  1.8],
+        [-3.1, -2.5, -1.1, -3.5, -4.7, -6.2, -0.9, -3.2, -1.4, -3.5, -2.8, -2.3,
+         -1.3, -3.1, -2.3,  0.4, -2.5, -3.9, -4.2, -1.6, -2.0, -1.7, -1.0, -5.0],
+        [-1.1, -1.4,  0.9, -2.3, -2.7, -3.2, -1.4, -1.0, -0.8,  1.0, -2.0, -0.7,
+         -0.7, -2.5, -2.9, -1.0, -1.0, -1.2, -3.1, -0.6,  1.4, -0.7, -0.9, -1.8]])
+all values (shape torch.Size([6, 28])): 
+ tensor([[-0.8,  0.3,  1.7,  1.6,  2.2,  1.1,  1.7,  1.6,  1.8,  1.0,  1.3,  0.3,
+          0.3,  0.3,  2.4,  2.0, -1.1,  0.7, -0.2,  0.8,  0.5,  1.0,  1.3,  0.2,
+         -0.3,  0.9,  1.7, -0.3],
+        [ 0.5,  0.3,  0.2,  0.1, -0.2, -1.3, -0.9, -1.3, -0.4, -0.1,  1.1,  0.4,
+         -0.7,  0.1, -1.1,  0.3, -0.3,  0.8, -1.1,  3.0, -0.3,  1.6,  2.7,  0.5,
+         -2.5, -1.5, -0.4,  0.2],
+        [-1.1, -0.9, -3.0, -0.7, -2.2,  0.1,  0.0, -2.8, -2.1,  0.7, -0.7, -1.6,
+         -2.6, -1.3, -0.9, -0.5, -1.8, -3.0, -0.7, -1.3,  0.5, -1.1, -1.8, -2.2,
+          0.6, -0.0, -1.8, -1.3],
+        [ 2.2,  3.5, -2.0,  3.1,  0.7,  3.2,  2.8,  0.8,  2.7,  2.6,  0.1,  1.0,
+          1.1,  3.6,  3.5,  2.5,  2.8,  2.3,  2.6,  4.4,  3.1,  5.2,  2.9,  2.7,
+          4.3,  1.3,  1.4,  3.8],
+        [-1.4, -3.1, -1.4, -1.0, -0.9, -2.5, -2.1, -1.9, -2.0, -3.8, -3.9, -3.1,
+         -2.2, -3.1, -3.7, -1.9, -1.9, -1.7, -1.4, -4.2, -3.5, -1.8, -3.1, -1.7,
+         -2.1, -1.9, -2.1, -3.5],
+        [-0.3, -2.7,  0.8,  1.5,  0.0, -1.9, -0.7,  1.2, -1.0, -4.3,  0.8, -3.7,
+         -1.2, -2.9,  0.7, -1.6, -1.8, -0.4, -1.7, -1.0,  0.2,  2.9, -1.4,  0.9,
+         -1.4, -2.6, -0.4, -0.7]])</code></pre>
+</div>
+</div>
+<p>This is a matrix with one row per word in our input sequence, each such row representing the key or value vector for the correponding word.</p>
+<p>If we want to get to the attention-vector for the second input element, that element will act as the query. We will matrix-multiply that query with the keys for each of the other input elements so we will do from 1 to <span class="math inline">\(T\)</span> (our sequence length):</p>
+<ul>
+<li><span class="math inline">\(q^{(2)} \cdot k^{(1)} = \omega_{2,1}\)</span></li>
+<li><span class="math inline">\(q^{(2)} \cdot k^{(2)} = \omega_{2,2}\)</span></li>
+<li>…</li>
+<li><span class="math inline">\(q^{(2)} \cdot k^{(T)} = \omega_{2,T}\)</span></li>
+</ul>
+<p>For example, for <span class="math inline">\(\omega_{2,4}\)</span>:</p>
+<ul>
+<li><span class="math inline">\(q^{(2)}\)</span> is: <code>[-2.4, -1.3,  0.0,  0.4, -0.2, ... , -1.7,  1.0, -1.1, -3.2]</code></li>
+<li><span class="math inline">\(k^{(4)}\)</span> is: <code>[-3.1, -2.5, -1.1, -3.5, -4.7, ..., -2.0, -1.7, -1.0, -5.0]</code></li>
+</ul>
+<p>so <span class="math inline">\(\omega_{2,4} = q^{(2)} \cdot k^{(4)}\)</span> (dimensions: <span class="math inline">\([24] \times [24]\)</span>):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>omega_24 <span class="op">=</span> query_2.dot(keys[<span class="dv">4</span>]) <span class="co"># note: this is the same as: query_2 @ keys[4]</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>omega_24</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor(76.0)</code></pre>
+</div>
+</div>
+<p>This tensor is the unnormalized attention weight for the query at the 5th input element (index 4). Also here we can generalize this from one input element to another (element with idx 2 to element with idx 4), towards an element and all input elements in our sequence.</p>
+<p><span class="math inline">\(\omega_2 = q^{(2)} \cdot k\)</span> (dimensions: <span class="math inline">\([24] \times [24, 6]\)</span>)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>omega_2 <span class="op">=</span> query_2 <span class="op">@</span> keys.T</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>omega_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([ -9.9, -13.0,  32.0, -60.8,  76.0,  36.6])</code></pre>
+</div>
+</div>
+<p>This tensor contains the attention weights for each of the 6 words/tokens in our sequence with respect to token on index 4.</p>
+</section>
+<section id="computing-attention-scores" class="level2">
+<h2 class="anchored" data-anchor-id="computing-attention-scores">Computing Attention Scores</h2>
+<p>We now need to move from our unnormalized attention weights <span class="math inline">\(\omega\)</span> towards normalized weights: <span class="math inline">\(\alpha\)</span>. We’ll do this through a softmax function, scaled by dividing by <span class="math inline">\(\sqrt{d_k}\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>scaled <span class="op">=</span> omega_2 <span class="op">/</span> (d_k<span class="op">**</span><span class="fl">0.5</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>attention_weights_2 <span class="op">=</span> F.softmax(scaled, dim<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>torch.set_printoptions(precision<span class="op">=</span><span class="dv">9</span>, sci_mode<span class="op">=</span><span class="va">False</span>, profile<span class="op">=</span><span class="st">'short'</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(scaled)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">''</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'attention weights: </span><span class="ch">\n</span><span class="sc">{</span>attention_weights_2<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'sum: </span><span class="ch">\n</span><span class="sc">{</span>torch<span class="sc">.</span><span class="bu">sum</span>(attention_weights_2)<span class="sc">}</span><span class="ss">'</span>) <span class="co"># sums up to 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tensor([ -2.017098665,  -2.646891594,   6.530897617, -12.409937859,
+         15.506885529,   7.466487408])
+
+attention weights: 
+tensor([    0.000000025,     0.000000013,     0.000126352,     0.000000000,
+            0.999551475,     0.000322036])
+sum: 
+0.9999998807907104</code></pre>
+</div>
+</div>
+<p>Now we compute the context vector <span class="math inline">\(z^{(2)}\)</span>, which is an attention-weighted version of our input element <span class="math inline">\(x^{(2)}\)</span> (the embedded tensor for the token on index 2 of our sequence). Dimensions:</p>
+<ul>
+<li><span class="math inline">\(\alpha_2\)</span> is <code>6</code></li>
+<li><span class="math inline">\(values\)</span> is <code>6, 28</code></li>
+<li><span class="math inline">\(z^{(2)}\)</span> is <code>28</code> = <span class="math inline">\(1 \times 6\)</span> @ <span class="math inline">\(6 \times 28\)</span></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>context_vector_2 <span class="op">=</span> attention_weights_2 <span class="op">@</span> values</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>context_vector_2.shape, context_vector_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(torch.Size([28]),
+ tensor([-1.434536815, -3.057869434, -1.372985959, -1.015810966, -0.939488649,
+         -2.540240049, -2.134411335, -1.869234562, -1.999078512, -3.760509729,
+         -3.873581171, -3.136465788, -2.163633823, -3.094663382, -3.710036516,
+         -1.867943287, -1.886817217, -1.702059269, -1.404274344, -4.158794403,
+         -3.530863047, -1.818631649, -3.132727146, -1.715395093, -2.099170208,
+         -1.885426879, -2.099651337, -3.486021757]))</code></pre>
+</div>
+</div>
+<p>So what did we see here? We have all the normalized attention weights for every element in the sequence with respect to our input element on index 2 in the sequence. That’s <code>attention_weights_2</code> or <span class="math inline">\(\alpha_2\)</span>. We multiply that vector with <code>values</code>, which is the collection of value vectors for each of our input elements: 6 elements, with each a vector of 28 floats. The resulting tensor, is a weighted combination of all 6 vectors with 28 values into a single vector of 28 values. This is the context vector for input element on index 2.</p>
+</section>
+<section id="multi-head-attention" class="level2">
+<h2 class="anchored" data-anchor-id="multi-head-attention">Multi-Head Attention</h2>
+<p>TODO</p>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<ul>
+<li>we have our input sequence which is tokenized per word (in this case)</li>
+<li>using an embedding matrix, words are translated into a tensor of floats with <span class="math inline">\(d\)</span> dimensions</li>
+<li>we will want to calculate, for every element in the sequence 3 vectors:
+<ul>
+<li><span class="math inline">\(q^i\)</span>: the query vector for element on input index i, with dimension we choose: <span class="math inline">\(d_q\)</span> (<span class="math inline">\(d_q = d_k\)</span>)</li>
+<li><span class="math inline">\(k^i\)</span>: the key vector for element on input index i, with dimension we choose: <span class="math inline">\(d_k\)</span> (<span class="math inline">\(d_q = d_k\)</span>)</li>
+</ul></li>
+<li>to calculate these two vectors for every input element, we define 3 weight matrices:
+<ul>
+<li><span class="math inline">\(W_{q}\)</span></li>
+<li><span class="math inline">\(W_{k}\)</span></li>
+<li><span class="math inline">\(W_{v}\)</span></li>
+</ul></li>
+</ul>
+<p>TODO</p>
+</section>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">Resources</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1706.03762">Attention is all you need</a></li>
+<li><a href="https://arxiv.org/abs/2106.06981">Thinking Like Transformers</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
